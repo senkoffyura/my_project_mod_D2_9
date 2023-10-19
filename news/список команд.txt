@@ -1,0 +1,71 @@
+python manage.py shell
+from news.models import *
+
+u1 = User.objects.create_user(username='Semyon')	#создаем первого пользователя
+u2 = User.objects.create_user(username='Petr')		#создаем второго пользователя
+
+Author.objects.create(user_name=u1)			#создаем первого автора
+Author.objects.create(user_name=u2)			#создаем второго автора
+
+Category.objects.create(category='Спорт')		#добавляем карегорию статьи/новости "Спорт" (id=1)
+Category.objects.create(category='Политика')		#добавляем карегорию статьи/новости "Политика" (id=2)
+Category.objects.create(category='Наука')		#добавляем карегорию статьи/новости "Наука" (id=3)
+Category.objects.create(category='Финансы')		#добавляем карегорию статьи/новости "Финансы" (id=4)
+
+a1=Author.objects.get(id=1)
+a2=Author.objects.get(id=2)
+
+Post.objects.create(autor=a1, choice_content="AR", tutle="Tutle1", article_text="BIGtext1")	#Добавляем статью("AR")(id=1) 
+Post.objects.create(autor=a2, choice_content="NW", tutle="Tutle2", article_text="BIG_NW_text1")	#Добавляем новость("NW")(id=2)
+Post.objects.create(autor=a2, choice_content="AR", tutle="Tutle3", article_text="BIG_AW_text2")	#Добавляем статью("AR")(id=3)
+
+Post.objects.get(id=1).category.add(Category.objects.get(id=2))					#Присваиваем катерию(id=2) статье (id=1)
+Post.objects.get(id=1).category.add(Category.objects.get(id=4))					#Присваиваем катерию(id=4) статье (id=1)
+Post.objects.get(id=3).category.add(Category.objects.get(id=3))					#Присваиваем катерию(id=3) статье (id=3)
+Post.objects.get(id=3).category.add(Category.objects.get(id=4))					#Присваиваем катерию(id=4) статье (id=3)
+Post.objects.get(id=2).category.add(Category.objects.get(id=1))					#Присваиваем катерию(id=1) новости (id=2)
+
+Comment.objects.create(post=Post.objects.get(id=1), user_name=Author.objects.get(id=2).user_name, comment="comment1")	#Добавляем комент к статье(id=1)
+Comment.objects.create(post=Post.objects.get(id=2), user_name=Author.objects.get(id=1).user_name, comment="comment2")	#Добавляем комент к новости(id=2)
+Comment.objects.create(post=Post.objects.get(id=3), user_name=Author.objects.get(id=1).user_name, comment="comment3")	#Добавляем комент к статье(id=3)
+Comment.objects.create(post=Post.objects.get(id=3), user_name=Author.objects.get(id=2).user_name, comment="comment4")	#Добавляем комент к статье(id=3)
+
+Comment.objects.get(id=1).like()		#корректируем рейтинг коментария
+Comment.objects.get(id=1).like()		#корректируем рейтинг коментария
+Comment.objects.get(id=2).dislike()		#корректируем рейтинг коментария
+Comment.objects.get(id=3).like()		#корректируем рейтинг коментария
+Comment.objects.get(id=3).like()		#корректируем рейтинг коментария
+Comment.objects.get(id=3).like()		#корректируем рейтинг коментария
+Comment.objects.get(id=4).dislike()		#корректируем рейтинг коментария
+
+
+Post.objects.get(id=1).like()			#корректируем рейтинг поста
+Post.objects.get(id=2).dislike()		#корректируем рейтинг поста
+Post.objects.get(id=3).like()			#корректируем рейтинг поста
+Post.objects.get(id=3).like()			#корректируем рейтинг поста
+
+a1.update()					#Обновляем рейтинг автора
+a2.update()					#Обновляем рейтинг автора
+
+a = Author.objects.order_by('-rating')[:1]	#Выбираем автора с наибольшим рейтингом
+
+a[0].user_name
+a[0].rating
+
+p = Post.objects.order_by('-rating')[:1]	#Выбираем пост с наибольшим рейтингом	
+
+p[0].time_creates
+p[0].autor.user_name
+p[0].rating
+p[0].tutle
+p[0].preview()
+
+n = p[0].id
+d = Comment.objects.filter(post = n)		#Выбираем все коментарии к найденному посту
+for i in d:					
+   i.time_creates				#Выводим дату коментария
+   i.rating					#Выводим рейтинг коментария
+   i.comment					#Выводим коментарии
+   i.user_name.username				#Выводим автора коментария
+ 
+
